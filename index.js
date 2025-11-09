@@ -1,0 +1,69 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const port = process.env.PORT || 3000;
+const dotenv = require('dotenv');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+//middleware
+
+app.use(cors());
+app.use(express.json())
+dotenv.config();
+
+app.get('/', (req,res) => {
+    res.send('UMS server is running')
+})
+
+app.listen(port, () => {
+    console.log(`UMS server is running on port: ${port}`);
+})
+
+const uri = process.env.MONGO_URI;
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function run() {
+  try {
+
+    const db = client.db('usm-db');
+    const categoryCollection = db.collection('categories')
+
+      app.get("/categories", async (req, res) => {
+      try {
+        const result = await categoryCollection.find().toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching categories", error });
+      }
+    });
+
+    app.post("/categories", async (req, res) => {
+      try {
+        const newCategory = req.body;
+        const result = await categoryCollection.insertOne(newCategory);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error adding category", error });
+      }
+    });
+
+
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    //await client.close();
+  }
+}
+run().catch(console.dir);
