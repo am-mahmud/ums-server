@@ -44,6 +44,8 @@ async function run() {
         const userCollection = db.collection('users');
         const myBillsCollection = db.collection("myBills");
 
+        //Bill category db
+
         app.get("/categories", async (req, res) => {
             try {
                 const result = await categoryCollection.find().toArray();
@@ -54,10 +56,10 @@ async function run() {
         });
 
 
-        const recentBillsCollection = db.collection('recent-bills');
+        //Recent Bills 
         app.get("/recent-bills", async (req, res) => {
             try {
-                const result = await recentBillsCollection.find().sort({ date: -1 }).limit(6).toArray();
+                const result = await allBillsCollection.find().sort({ date: -1 }).limit(6).toArray();
                 res.send(result);
             } catch (error) {
                 res.status(500).send({ message: "Error fetching categories", error });
