@@ -67,7 +67,7 @@ async function run() {
         });
 
 
-       
+        // All bills
         app.get("/bills", async (req, res) => {
             try {
                 const result = await allBillsCollection.find().sort({ date: -1 }).toArray();
@@ -78,6 +78,7 @@ async function run() {
         });
 
 
+        //Add a bill 
         app.post("/bills", async (req, res) => {
             try {
                 const newBill = req.body;
