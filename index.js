@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json())
 dotenv.config();
 
-app.get('/', (req,res) => {
+app.get('/', (req, res) => {
     res.send('UMS server is running')
 })
 
@@ -23,47 +23,92 @@ const uri = process.env.MONGO_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
-  try {
+    try {
 
-    const db = client.db('usm-db');
-    const categoryCollection = db.collection('categories')
+        const db = client.db('usm-db');
+        const categoryCollection = db.collection('categories')
 
-      app.get("/categories", async (req, res) => {
-      try {
-        const result = await categoryCollection.find().toArray();
-        res.send(result);
-      } catch (error) {
-        res.status(500).send({ message: "Error fetching categories", error });
-      }
-    });
+        app.get("/categories", async (req, res) => {
+            try {
+                const result = await categoryCollection.find().toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching categories", error });
+            }
+        });
 
-    app.post("/categories", async (req, res) => {
-      try {
-        const newCategory = req.body;
-        const result = await categoryCollection.insertOne(newCategory);
-        res.send(result);
-      } catch (error) {
-        res.status(500).send({ message: "Error adding category", error });
-      }
-    });
+        // app.post("/categories", async (req, res) => {
+        //   try {
+        //     const newCategory = req.body;
+        //     const result = await categoryCollection.insertOne(newCategory);
+        //     res.send(result);
+        //   } catch (error) {
+        //     res.status(500).send({ message: "Error adding category", error });
+        //   }
+        // });
+
+        const recentBillsCollection = db.collection('recent-bills');
+        app.get("/recent-bills", async (req, res) => {
+            try {
+                const result = await recentBillsCollection.find().sort({ date: -1 }).limit(6).toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching categories", error });
+            }
+        });
 
 
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    //await client.close();
-  }
+        const allBillsCollection = db.collection('bills');
+        app.get("/bills", async (req, res) => {
+            try {
+                const result = await allBillsCollection.find().toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching categories", error });
+            }
+        });
+
+
+        const userCollection = db.collection('users');
+
+        app.post('/users', async (req, res) => {
+            const newUser = req.body;
+
+
+            const email = req.body.email;
+
+            const query = { email: email }
+            const existingUser = await userCollection.findOne(query)
+
+            if (existingUser) {
+                res.send('User exits')
+            }
+            else {
+                const result = await userCollection.insertOne(newUser)
+                res.send(result)
+            }
+
+        })
+
+
+
+
+        // Connect the client to the server	(optional starting in v4.7)
+        await client.connect();
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        //await client.close();
+    }
 }
 run().catch(console.dir);
