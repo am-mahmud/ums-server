@@ -89,9 +89,26 @@ async function run() {
             }
         });
 
+        //Bill details
+        app.get("/bills/:id", async (req, res) => {
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
+
+                const result = await allBillsCollection.findOne(query);
+
+                if (!result) {
+                    return res.status(404).send({ message: "Bill not found" });
+                }
+
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching bill details", error });
+            }
+        });
 
 
-        //User DB
+       
        
 
         app.post('/users', async (req, res) => {
@@ -111,23 +128,7 @@ async function run() {
         })
 
 
-        //Bill by ID
-        app.get("/bills/:id", async (req, res) => {
-            try {
-                const id = req.params.id;
-                const query = { _id: new ObjectId(id) };
-
-                const result = await allBillsCollection.findOne(query);
-
-                if (!result) {
-                    return res.status(404).send({ message: "Bill not found" });
-                }
-
-                res.send(result);
-            } catch (error) {
-                res.status(500).send({ message: "Error fetching bill details", error });
-            }
-        });
+      
 
 
         //mybills part 
