@@ -89,7 +89,7 @@ async function run() {
             const existingUser = await userCollection.findOne(query)
 
             if (existingUser) {
-                res.send('User exits')
+                res.send({ message: 'User exits' })
             }
             else {
                 const result = await userCollection.insertOne(newUser)
@@ -99,7 +99,23 @@ async function run() {
         })
 
 
+        //Bill by ID
+        app.get("/bills/:id", async (req, res) => {
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
 
+                const result = await allBillsCollection.findOne(query);
+
+                if (!result) {
+                    return res.status(404).send({ message: "Bill not found" });
+                }
+
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching bill details", error });
+            }
+        });
 
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
