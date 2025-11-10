@@ -1,9 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const port = process.env.PORT || 3000;
 const dotenv = require('dotenv');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+
 
 //middleware
 
@@ -44,7 +47,6 @@ async function run() {
                 res.status(500).send({ message: "Error fetching categories", error });
             }
         });
-
 
 
         const recentBillsCollection = db.collection('recent-bills');
@@ -122,7 +124,7 @@ async function run() {
 
         //mybills part 
 
-        const myBillsCollection = db.collection("myBil  ls");
+        const myBillsCollection = db.collection("myBills");
 
         app.get("/my-bills", async (req, res) => {
             try {
