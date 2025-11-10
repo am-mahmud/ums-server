@@ -117,6 +117,61 @@ async function run() {
             }
         });
 
+
+        //mybills part 
+
+        const myBillsCollection = db.collection("myBills");
+
+        app.get("/my-bills", async (req, res) => {
+            try {
+                const email = req.query.email;
+                const result = await myBillsCollection.find({ email }).toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error fetching user bills", error });
+            }
+        });
+
+        app.post("/my-bills", async (req, res) => {
+            try {
+                const newPayment = req.body;
+                const result = await myBillsCollection.insertOne(newPayment);
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error saving bill payment", error });
+            }
+        });
+
+        app.patch("/my-bills/:id", async (req, res) => {
+            const id = req.params.id;
+            const updateData = req.body;
+
+            const result = await myBillsCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: updateData }
+            );
+
+            res.send(result);
+        });
+
+
+        app.delete("/my-bills/:id", async (req, res) => {
+            try {
+                const id = req.params.id;
+
+                const result = await myBillsCollection.deleteOne({
+                    _id: new ObjectId(id),
+                });
+
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error deleting bill", error });
+            }
+        });
+
+
+
+
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         // Send a ping to confirm a successful connection
