@@ -61,7 +61,7 @@ async function run() {
         const allBillsCollection = db.collection('bills');
         app.get("/bills", async (req, res) => {
             try {
-                const result = await allBillsCollection.find().toArray();
+                const result = await allBillsCollection.find().sort({ date: -1 }).toArray();
                 res.send(result);
             } catch (error) {
                 res.status(500).send({ message: "Error fetching categories", error });
@@ -122,7 +122,7 @@ async function run() {
 
         //mybills part 
 
-        const myBillsCollection = db.collection("myBills");
+        const myBillsCollection = db.collection("myBil  ls");
 
         app.get("/my-bills", async (req, res) => {
             try {
