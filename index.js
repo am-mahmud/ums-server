@@ -3,16 +3,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
+dotenv.config();
+
 const app = express();
+app.use(cors());
+app.use(express.json())
+
+//Any port
 const port = process.env.PORT || 3000;
 
 
-
-//middleware
-
-app.use(cors());
-app.use(express.json())
-dotenv.config();
 
 app.get('/', (req, res) => {
     res.send('UMS server is running')
