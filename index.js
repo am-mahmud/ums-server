@@ -33,12 +33,16 @@ const client = new MongoClient(uri, {
 });
 
 
-
+// Main Database Connections 
 async function run() {
     try {
-
+        // DB Name - usm-db
         const db = client.db('usm-db');
+        // All collections 
         const categoryCollection = db.collection('categories')
+        const allBillsCollection = db.collection('bills');
+        const userCollection = db.collection('users');
+        const myBillsCollection = db.collection("myBills");
 
         app.get("/categories", async (req, res) => {
             try {
@@ -61,7 +65,7 @@ async function run() {
         });
 
 
-        const allBillsCollection = db.collection('bills');
+       
         app.get("/bills", async (req, res) => {
             try {
                 const result = await allBillsCollection.find().sort({ date: -1 }).toArray();
@@ -85,7 +89,7 @@ async function run() {
 
 
         //User DB
-        const userCollection = db.collection('users');
+       
 
         app.post('/users', async (req, res) => {
             const newUser = req.body;
@@ -125,7 +129,7 @@ async function run() {
 
         //mybills part 
 
-        const myBillsCollection = db.collection("myBills");
+       
 
         app.get("/my-bills", async (req, res) => {
             try {
