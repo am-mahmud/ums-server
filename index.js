@@ -129,12 +129,7 @@ async function run() {
 
 
       
-
-
-        //mybills part 
-
-       
-
+        // My bills 
         app.get("/my-bills", async (req, res) => {
             try {
                 const email = req.query.email;
@@ -156,15 +151,19 @@ async function run() {
         });
 
         app.patch("/my-bills/:id", async (req, res) => {
-            const id = req.params.id;
-            const updateData = req.body;
+            try {
+                const id = req.params.id;
+                const updateData = req.body;
 
-            const result = await myBillsCollection.updateOne(
-                { _id: new ObjectId(id) },
-                { $set: updateData }
-            );
+                const result = await myBillsCollection.updateOne(
+                    { _id: new ObjectId(id) },
+                    { $set: updateData }
+                );
 
-            res.send(result);
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Error updating bill", error });
+            }
         });
 
 
