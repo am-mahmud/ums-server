@@ -12,19 +12,18 @@ app.use(express.json())
 //Any port
 const port = process.env.PORT || 3000;
 
-
-
+// Default routes to check mongoDB is working
 app.get('/', (req, res) => {
     res.send('UMS server is running')
 })
-
 app.listen(port, () => {
     console.log(`UMS server is running on port: ${port}`);
 })
 
+
+//MongoDB Client 
 const uri = process.env.MONGO_URI;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -32,6 +31,8 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     }
 });
+
+
 
 async function run() {
     try {
