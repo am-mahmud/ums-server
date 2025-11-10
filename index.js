@@ -45,15 +45,7 @@ async function run() {
             }
         });
 
-        // app.post("/categories", async (req, res) => {
-        //   try {
-        //     const newCategory = req.body;
-        //     const result = await categoryCollection.insertOne(newCategory);
-        //     res.send(result);
-        //   } catch (error) {
-        //     res.status(500).send({ message: "Error adding category", error });
-        //   }
-        // });
+
 
         const recentBillsCollection = db.collection('recent-bills');
         app.get("/recent-bills", async (req, res) => {
@@ -77,14 +69,24 @@ async function run() {
         });
 
 
+        app.post("/bills", async (req, res) => {
+            try {
+                const newBill = req.body;
+                const result = await allBillsCollection.insertOne(newBill);
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({ message: "Failed to add bill", error });
+            }
+        });
+
+
+
+        //User DB
         const userCollection = db.collection('users');
 
         app.post('/users', async (req, res) => {
             const newUser = req.body;
-
-
             const email = req.body.email;
-
             const query = { email: email }
             const existingUser = await userCollection.findOne(query)
 
@@ -168,8 +170,6 @@ async function run() {
                 res.status(500).send({ message: "Error deleting bill", error });
             }
         });
-
-
 
 
         // Connect the client to the server	(optional starting in v4.7)
