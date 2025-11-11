@@ -148,15 +148,6 @@ async function run() {
             }
         });
 
-        // app.post("/my-bills", async (req, res) => {
-        //     try {
-        //         const newPayment = req.body;
-        //         const result = await myBillsCollection.insertOne(newPayment);
-        //         res.send(result);
-        //     } catch (error) {
-        //         res.status(500).send({ message: "Error saving bill payment", error });
-        //     }
-        // });
 
         app.post("/my-bills", async (req, res) => {
             try {
@@ -165,9 +156,7 @@ async function run() {
                 if (!newPayment.email || !newPayment.billId || !newPayment.amount) {
                     return res.status(400).send({ message: "Missing required fields" });
                 }
-
                 const result = await myBillsCollection.insertOne(newPayment);
-
                 res.send(result);
             } catch (error) {
                 res.status(500).send({ message: "Error saving bill payment", error });
