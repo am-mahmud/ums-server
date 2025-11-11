@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 dotenv.config();
 
@@ -70,10 +70,21 @@ async function run() {
         // All bills
         app.get("/bills", async (req, res) => {
             try {
-                const result = await allBillsCollection.find().sort({ date: -1 }).toArray();
+                const { category } = req.query;
+
+                let query = {};
+                if (category && category !== "All") {
+                    query.category = category;
+                }
+
+                const result = await allBillsCollection
+                    .find(query)
+                    .sort({ date: -1 })
+                    .toArray();
+
                 res.send(result);
             } catch (error) {
-                res.status(500).send({ message: "Error fetching categories", error });
+                res.status(500).send({ message: "Error fetching bills", error });
             }
         });
 
@@ -108,7 +119,7 @@ async function run() {
         });
 
 
-    
+
         //User DB
         app.post('/users', async (req, res) => {
             const newUser = req.body;
@@ -125,7 +136,7 @@ async function run() {
             }
 
         })
-      
+
         // My bills 
         app.get("/my-bills", async (req, res) => {
             try {
