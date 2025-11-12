@@ -7,9 +7,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 dotenv.config();
 
 
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-var serviceAccount = require("./ums-auth-firebase-adminsdk.json");
+const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -65,7 +66,7 @@ const verifyJWTToken = (req, res, next) => {
             return res.status(401).send({ message: 'unauthorized access' })
         }
         // put it in the right place
-        console.log('after decoded', decoded);
+        //console.log('after decoded', decoded);
         req.token_email = decoded.email;
         next();
     })
