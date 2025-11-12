@@ -1,13 +1,77 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 dotenv.config();
 
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./ums-auth-firebase-adminsdk.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
 const app = express();
+//Middleware 
 app.use(cors());
 app.use(express.json())
+
+
+
+// const logger = (req, res, next) => {
+//     console.log('Logging Information');
+//     next()
+// }
+
+//JWT Updated
+
+const verifyFireBaseToke = async (req, res, next) => {
+    console.log('In the verify middleware', req.headers.authorization);
+    if (!req.headers.authorization) {
+        return res.status(401).send({ message: 'Unauthorized access' })
+    }
+    const token = req.headers.authorization.split(' ')[1]
+    if (!token) {
+        return res.status(401).send({ message: 'Unauthorized access' })
+    }
+
+    try {
+        const userInfo = await admin.auth().verifyIdToken(token);
+        req.token_email = userInfo.email;
+        next();
+    } catch {
+        return res.status(401).send({ message: 'Unauthorized access' })
+    }
+
+}
+
+const verifyJWTToken = (req, res, next) => {
+
+    const authorization = req.headers.authorization;
+    if (!authorization) {
+        return res.status(401).send({ message: 'unauthorized access' })
+    }
+    const token = authorization.split(' ')[1];
+    if (!token) {
+        return res.status(401).send({ message: 'unauthorized access' })
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: 'unauthorized access' })
+        }
+        // put it in the right place
+        console.log('after decoded', decoded);
+        req.token_email = decoded.email;
+        next();
+    })
+
+
+}
 
 //Any port
 const port = process.env.PORT || 3000;
@@ -43,6 +107,13 @@ async function run() {
         const allBillsCollection = db.collection('bills');
         const userCollection = db.collection('users');
         const myBillsCollection = db.collection("myBills");
+
+        // JWT Related API
+        app.post('/getToken', (req, res) => {
+            const loggedUser = req.body;
+            const token = jwt.sign(loggedUser, process.env.JWT_SECRET, { expiresIn: '1h' })
+            res.send({ token: token })
+        })
 
         //Bill category db
 
@@ -138,7 +209,7 @@ async function run() {
         })
 
         // My bills 
-        app.get("/my-bills", async (req, res) => {
+        app.get("/my-bills", verifyJWTToken, async (req, res) => {
             try {
                 const email = req.query.email;
                 const result = await myBillsCollection.find({ email }).toArray();
@@ -181,7 +252,7 @@ async function run() {
         });
 
 
-        app.delete("/my-bills/:id", async (req, res) => {
+        app.delete("/my-bills/:id",  async (req, res) => {
             try {
                 const id = req.params.id;
 
@@ -199,7 +270,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         // Send a ping to confirm a successful connection
-       // await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
