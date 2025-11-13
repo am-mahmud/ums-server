@@ -30,7 +30,7 @@ app.use(express.json())
 
 //JWT Updated
 
-const verifyFireBaseToke = async (req, res, next) => {
+const verifyFireBaseToken = async (req, res, next) => {
     console.log('In the verify middleware', req.headers.authorization);
     if (!req.headers.authorization) {
         return res.status(401).send({ message: 'Unauthorized access' })
@@ -162,7 +162,7 @@ async function run() {
 
 
         //Add a bill 
-        app.post("/bills", async (req, res) => {
+        app.post("/bills", verifyJWTToken, async (req, res) => {
             try {
                 const newBill = req.body;
                 const result = await allBillsCollection.insertOne(newBill);
@@ -173,7 +173,7 @@ async function run() {
         });
 
         //Bill details
-        app.get("/bills/:id", async (req, res) => {
+        app.get("/bills/:id", verifyJWTToken, async (req, res) => {
             try {
                 const id = req.params.id;
                 const query = { _id: new ObjectId(id) };
@@ -221,10 +221,11 @@ async function run() {
         });
 
 
-        app.post("/my-bills", async (req, res) => {
+        app.post("/my-bills",verifyJWTToken, async (req, res) => {
             try {
                 const newPayment = req.body;
 
+            
                 if (!newPayment.email || !newPayment.billId || !newPayment.amount) {
                     return res.status(400).send({ message: "Missing required fields" });
                 }
@@ -236,7 +237,7 @@ async function run() {
         });
 
 
-        app.patch("/my-bills/:id", async (req, res) => {
+        app.patch("/my-bills/:id",verifyJWTToken, async (req, res) => {
             try {
                 const id = req.params.id;
                 const updateData = req.body;
@@ -253,7 +254,7 @@ async function run() {
         });
 
 
-        app.delete("/my-bills/:id",  async (req, res) => {
+        app.delete("/my-bills/:id",verifyJWTToken,  async (req, res) => {
             try {
                 const id = req.params.id;
 
