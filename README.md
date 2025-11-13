@@ -6,7 +6,7 @@ The system provides a secure platform for users to view, pay, and download their
 ## 🔗 Necessary Links 
 |Live Site Link  |Sever Repository Link | Client Repository Link |
 |--------------|-------------|-------------|
-| Ready to deploy | https://github.com/am-mahmud/ums-server |  https://github.com/am-mahmud/ums-client
+| https://utility-management-system.netlify.app/ | https://github.com/am-mahmud/ums-server |  https://github.com/am-mahmud/ums-client
 
 ## 🧩 Project Overview
 
